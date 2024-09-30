@@ -229,6 +229,7 @@ GameObject:
   - component: {fileID: 722753109}
   - component: {fileID: 722753108}
   - component: {fileID: 722753112}
+  - component: {fileID: 722753113}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -350,6 +351,24 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &722753113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722753107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88e3c8ff1af4e014085d3fcd8e1c9baa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _prefabCube: {fileID: 7871301842372216991, guid: 5e76b42df78593040b2292a8a4c952dd, type: 3}
+  _spawner: {fileID: 722753113}
+  _spawnZone: {fileID: 1728696662}
+  _cubeSpawnTime: 0.3
+  _poolCapacity: 5
+  _poolMaxSize: 5
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,7 +740,6 @@ GameObject:
   - component: {fileID: 1728696666}
   - component: {fileID: 1728696665}
   - component: {fileID: 1728696664}
-  - component: {fileID: 1728696667}
   m_Layer: 0
   m_Name: SpawnPlane
   m_TagString: Untagged
@@ -794,21 +812,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1728696667
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1728696662}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88e3c8ff1af4e014085d3fcd8e1c9baa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cube: {fileID: 1876277444595485197, guid: 5e76b42df78593040b2292a8a4c952dd, type: 3}
-  _spawner: {fileID: 1728696667}
-  _cubeSpawnTime: 0.3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

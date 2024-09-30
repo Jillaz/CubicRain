@@ -1,23 +1,52 @@
-using System.Collections;
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Cube _cube;
+    [SerializeField] private GameObject _prefabCube;
     [SerializeField] private Spawner _spawner;
-    [SerializeField] float _cubeSpawnTime;
+    [SerializeField] private GameObject _spawnZone;
+    [SerializeField] private float _cubeSpawnTime;
+    [SerializeField] private int _poolCapacity = 5;
+    [SerializeField] private int _poolMaxSize = 5;
+
+    private ObjectPool<GameObject> _pool;
 
     private void Awake()
     {
-        StartCoroutine(Spawn());
+        _pool = new ObjectPool<GameObject>(
+            createFunc: () => Instantiate(_prefabCube),
+            actionOnGet: (cube) => ActionOnGet(cube),
+            actionOnRelease: (cube) => cube.SetActive(false),
+            actionOnDestroy: (cube) => Destroy(cube),
+            collectionCheck: true,
+            defaultCapacity: _poolCapacity,
+            maxSize: _poolMaxSize
+            );
     }
 
-    private IEnumerator Spawn()
+    private void ActionOnGet(GameObject cube)
     {
-        while (true)
+        cube.transform.position = SetSpawnPosition();
+        cube.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        cube.SetActive(true);
+    }
+
+    private void Start()
+    {
+        InvokeRepeating(nameof(GetCube), 0f, _cubeSpawnTime);
+    }
+
+    private void GetCube()
+    {
+        _pool.Get();
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.TryGetComponent(out Cube cube))
         {
-            Instantiate(_cube, SetSpawnPosition(), Quaternion.identity);
-            yield return new WaitForSeconds(_cubeSpawnTime);
+            _pool.Release(collision.gameObject);
         }
     }
 
@@ -34,18 +63,18 @@ public class Spawner : MonoBehaviour
         float postitionZ;
         float postitionY;
 
-        scaleFactorX = transform.localScale.x;
-        scaleFactorZ = transform.localScale.z;
+        scaleFactorX = _spawnZone.transform.localScale.x;
+        scaleFactorZ = _spawnZone.transform.localScale.z;
 
-        minPositionX = transform.position.x - defaultLenghtFromCenter * scaleFactorX;
-        maxPositionX = transform.position.x + defaultLenghtFromCenter * scaleFactorX;
+        minPositionX = _spawnZone.transform.position.x - defaultLenghtFromCenter * scaleFactorX;
+        maxPositionX = _spawnZone.transform.position.x + defaultLenghtFromCenter * scaleFactorX;
 
-        minPositionZ = transform.position.z - defaultLenghtFromCenter * scaleFactorZ;
-        maxPositionZ = transform.position.z + defaultLenghtFromCenter * scaleFactorZ;
+        minPositionZ = _spawnZone.transform.position.z - defaultLenghtFromCenter * scaleFactorZ;
+        maxPositionZ = _spawnZone.transform.position.z + defaultLenghtFromCenter * scaleFactorZ;
 
         postitionX = Random.Range(minPositionX, maxPositionX);
         postitionZ = Random.Range(minPositionZ, maxPositionZ);
-        postitionY = transform.position.y;
+        postitionY = _spawnZone.transform.position.y;
 
         return new Vector3(postitionX, postitionY, postitionZ);
     }
