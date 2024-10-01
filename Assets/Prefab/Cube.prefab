@@ -147,6 +147,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f3a07f840c955946892966ba6f0c6a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _minLifeTime: 2
+  _maxLifeTime: 5
 --- !u!114 &1501813481223288498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,3 +161,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab488901229168546b762eb13deff7cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _color: {r: 1, g: 1, b: 1, a: 1}

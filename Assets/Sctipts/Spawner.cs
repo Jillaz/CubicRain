@@ -3,33 +3,24 @@ using UnityEngine.Pool;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private GameObject _prefabCube;
-    [SerializeField] private Spawner _spawner;
-    [SerializeField] private GameObject _spawnZone;
+    [SerializeField] private Cube _prefabCube;    
     [SerializeField] private float _cubeSpawnTime;
     [SerializeField] private int _poolCapacity = 5;
     [SerializeField] private int _poolMaxSize = 5;
 
-    private ObjectPool<GameObject> _pool;
+    private ObjectPool<Cube> _pool;
 
     private void Awake()
     {
-        _pool = new ObjectPool<GameObject>(
+        _pool = new ObjectPool<Cube>(
             createFunc: () => Instantiate(_prefabCube),
             actionOnGet: (cube) => ActionOnGet(cube),
-            actionOnRelease: (cube) => cube.SetActive(false),
+            actionOnRelease: (cube) => ActionOnRelease(cube),
             actionOnDestroy: (cube) => Destroy(cube),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
             );
-    }
-
-    private void ActionOnGet(GameObject cube)
-    {
-        cube.transform.position = SetSpawnPosition();
-        cube.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        cube.SetActive(true);
     }
 
     private void Start()
@@ -42,12 +33,23 @@ public class Spawner : MonoBehaviour
         _pool.Get();
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void ActionOnGet(Cube cube)
     {
-        if (collision.collider.TryGetComponent(out Cube cube))
-        {
-            _pool.Release(collision.gameObject);
-        }
+        cube.transform.position = SetSpawnPosition();                
+        cube.gameObject.SetActive(true);
+        cube.Release += ReleaseCube;
+    }
+
+    private void ReleaseCube(Cube cube)
+    {
+        _pool.Release(cube);
+    }
+
+    private void ActionOnRelease(Cube cube)
+    {        
+        cube.Release -= ReleaseCube;
+        cube.SetDefaults();
+        cube.gameObject.SetActive(false);
     }
 
     private Vector3 SetSpawnPosition()
@@ -63,18 +65,18 @@ public class Spawner : MonoBehaviour
         float postitionZ;
         float postitionY;
 
-        scaleFactorX = _spawnZone.transform.localScale.x;
-        scaleFactorZ = _spawnZone.transform.localScale.z;
+        scaleFactorX = transform.localScale.x;
+        scaleFactorZ = transform.localScale.z;
 
-        minPositionX = _spawnZone.transform.position.x - defaultLenghtFromCenter * scaleFactorX;
-        maxPositionX = _spawnZone.transform.position.x + defaultLenghtFromCenter * scaleFactorX;
+        minPositionX = transform.position.x - defaultLenghtFromCenter * scaleFactorX;
+        maxPositionX = transform.position.x + defaultLenghtFromCenter * scaleFactorX;
 
-        minPositionZ = _spawnZone.transform.position.z - defaultLenghtFromCenter * scaleFactorZ;
-        maxPositionZ = _spawnZone.transform.position.z + defaultLenghtFromCenter * scaleFactorZ;
+        minPositionZ = transform.position.z - defaultLenghtFromCenter * scaleFactorZ;
+        maxPositionZ = transform.position.z + defaultLenghtFromCenter * scaleFactorZ;
 
         postitionX = Random.Range(minPositionX, maxPositionX);
         postitionZ = Random.Range(minPositionZ, maxPositionZ);
-        postitionY = _spawnZone.transform.position.y;
+        postitionY = transform.position.y;
 
         return new Vector3(postitionX, postitionY, postitionZ);
     }
