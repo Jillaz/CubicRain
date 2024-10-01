@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,7 +12,7 @@ public class Cube : MonoBehaviour
     private float _lifeTime;
     private Painter _painter;
     private Rigidbody _rigidbody;
-    private bool _isColorChanged = false;    
+    private bool _isColorChanged = false;
     public UnityAction<Cube> Release;
 
     private void Awake()
@@ -28,10 +29,9 @@ public class Cube : MonoBehaviour
         _rigidbody.angularVelocity = Vector3.zero;
         transform.rotation = Quaternion.Euler(Vector3.zero);
     }
-
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.collider.TryGetComponent(out Cube cube) == true)
+        if (collision.gameObject.CompareTag("Platform") == false)
         {
             return;
         }
