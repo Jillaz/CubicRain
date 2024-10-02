@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,36 +11,28 @@ public class Cube : MonoBehaviour
     private float _lifeTime;
     private Painter _painter;
     private Rigidbody _rigidbody;
-    private bool _isColorChanged = false;
-    public UnityAction<Cube> Release;
+    private bool _isHitPlatform = false;
+    public event UnityAction<Cube> Release;
 
     private void Awake()
     {
         _painter = GetComponent<Painter>();
         _rigidbody = GetComponent<Rigidbody>();
-    }
+    }    
 
-    public void SetDefaults()
-    {
-        _isColorChanged = false;
-        _painter.SetDefaultColor();
-        _rigidbody.velocity = Vector3.zero;
-        _rigidbody.angularVelocity = Vector3.zero;
-        transform.rotation = Quaternion.Euler(Vector3.zero);
-    }
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Platform") == false)
+        if (collision.collider.TryGetComponent(out Platform platform) == false)
         {
             return;
         }
 
-        if (_isColorChanged == false)
+        if (_isHitPlatform == false)
         {
             _painter.SetRandomColor();
-            _isColorChanged = true;
+            _isHitPlatform = true;
             _lifeTime = Random.Range(_minLifeTime, _maxLifeTime);
-            StartCoroutine("ExecuteAfterTime");
+            StartCoroutine(ExecuteAfterTime());
         }
     }
 
@@ -50,5 +41,14 @@ public class Cube : MonoBehaviour
         yield return new WaitForSeconds(_lifeTime);
 
         Release.Invoke(this);
+    }
+
+    public void SetDefaults()
+    {
+        _isHitPlatform = false;
+        _painter.SetDefaultColor();
+        _rigidbody.velocity = Vector3.zero;
+        _rigidbody.angularVelocity = Vector3.zero;
+        transform.rotation = Quaternion.Euler(Vector3.zero);
     }
 }

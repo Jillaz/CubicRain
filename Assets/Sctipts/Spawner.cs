@@ -1,9 +1,10 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Cube _prefabCube;    
+    [SerializeField] private Cube _prefabCube;
     [SerializeField] private float _cubeSpawnTime;
     [SerializeField] private int _poolCapacity = 5;
     [SerializeField] private int _poolMaxSize = 5;
@@ -14,9 +15,9 @@ public class Spawner : MonoBehaviour
     {
         _pool = new ObjectPool<Cube>(
             createFunc: () => Instantiate(_prefabCube),
-            actionOnGet: (cube) => ActionOnGet(cube),
-            actionOnRelease: (cube) => ActionOnRelease(cube),
-            actionOnDestroy: (cube) => Destroy(cube),
+            actionOnGet: (cube) => OnActionGet(cube),
+            actionOnRelease: (cube) => OnActionRelease(cube),
+            actionOnDestroy: (gameObject) => Destroy(gameObject),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
@@ -25,17 +26,23 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        InvokeRepeating(nameof(GetCube), 0f, _cubeSpawnTime);
+        StartCoroutine(SpawnCubes());
     }
 
-    private void GetCube()
+    private IEnumerator SpawnCubes()
     {
-        _pool.Get();
+        var delay = new WaitForSeconds(_cubeSpawnTime);
+
+        while (true)
+        {
+            _pool.Get();
+            yield return delay;
+        }
     }
 
-    private void ActionOnGet(Cube cube)
+    private void OnActionGet(Cube cube)
     {
-        cube.transform.position = SetSpawnPosition();                
+        cube.transform.position = GetSpawnPosition();
         cube.gameObject.SetActive(true);
         cube.Release += ReleaseCube;
     }
@@ -45,14 +52,14 @@ public class Spawner : MonoBehaviour
         _pool.Release(cube);
     }
 
-    private void ActionOnRelease(Cube cube)
-    {        
+    private void OnActionRelease(Cube cube)
+    {
         cube.Release -= ReleaseCube;
         cube.SetDefaults();
         cube.gameObject.SetActive(false);
     }
 
-    private Vector3 SetSpawnPosition()
+    private Vector3 GetSpawnPosition()
     {
         float defaultLenghtFromCenter = 5f;
         float scaleFactorX;
