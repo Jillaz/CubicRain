@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent (typeof(Renderer))]
 public class Painter : MonoBehaviour
 {
-    [SerializeField] Color _color = Color.white;
+    [SerializeField] private Color _color = Color.white;
     private Renderer _renderer;
 
     private void Awake()

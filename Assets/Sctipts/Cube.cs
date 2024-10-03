@@ -36,13 +36,6 @@ public class Cube : MonoBehaviour
         }
     }
 
-    private IEnumerator ExecuteAfterTime()
-    {
-        yield return new WaitForSeconds(_lifeTime);
-
-        Release.Invoke(this);
-    }
-
     public void SetDefaults()
     {
         _isHitPlatform = false;
@@ -50,5 +43,12 @@ public class Cube : MonoBehaviour
         _rigidbody.velocity = Vector3.zero;
         _rigidbody.angularVelocity = Vector3.zero;
         transform.rotation = Quaternion.Euler(Vector3.zero);
+    }
+
+    private IEnumerator ExecuteAfterTime()
+    {
+        yield return new WaitForSeconds(_lifeTime);
+
+        Release?.Invoke(this);
     }
 }
